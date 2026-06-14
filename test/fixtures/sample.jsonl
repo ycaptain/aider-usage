@@ -1,0 +1,12 @@
+{"event": "launched", "properties": {}, "user_id": "u1", "time": 1755100300}
+{"event": "cli session", "properties": {"main_model": "gpt-4", "edit_format": "diff"}, "user_id": "u1", "time": 1755100327}
+{"event": "message_send", "properties": {"main_model": "gpt-4", "edit_format": "diff", "prompt_tokens": 1000, "completion_tokens": 50, "total_tokens": 1050, "cost": 0.01, "total_cost": 0.01}, "user_id": "u1", "time": 1755100406}
+{"event": "command_run", "properties": {}, "user_id": "u1", "time": 1755100410}
+{"event": "message_send", "properties": {"main_model": "gpt-4", "edit_format": "diff", "prompt_tokens": 2000, "completion_tokens": 80, "total_tokens": 2080, "cost": 0.02, "total_cost": 0.03}, "user_id": "u1", "time": 1755100500}
+{"event": "command_ask", "properties": {}, "user_id": "u1", "time": 1755100520}
+this line is corrupted and should be skipped
+{"event": "message_send", "properties": {"main_model": "claude-3", "edit_format": "whole", "prompt_tokens": 500, "completion_tokens": 30, "cost": null, "total_cost": 0.005}, "user_id": "u1", "time": 1755200000}
+{"event": "exit", "properties": {"reason": "Completed main CLI coder.run"}, "user_id": "u1", "time": 1755200100}
+{"event": "cli session", "properties": {"main_model": "claude-3", "edit_format": "diff"}, "user_id": "u1", "time": 1755300000}
+{"event": "message_send", "properties": {"main_model": "claude-3", "edit_format": "diff", "prompt_tokens": 3000, "completion_tokens": 200, "cost": 0.05, "total_cost": 0.05}, "user_id": "u1", "time": 1755300100}
+{"event": "command_run", "properties": {}, "user_id": "u1", "time": 1755300200}
