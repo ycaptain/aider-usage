@@ -7,3 +7,6 @@ coverage/
 
 # Local AI/agent instructions — not part of the public project
 CLAUDE.md
+
+# Spec/brainstorm scaffolding from agent workflows — not part of the public project
+.workflow/

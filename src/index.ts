@@ -4,5 +4,8 @@ export * from "./reader.js";
 export * from "./filter.js";
 export * from "./sessionize.js";
 export * from "./aggregate.js";
+export * from "./capability.js";
+export * from "./style.js";
 export * from "./render.js";
+export * from "./summary.js";
 export * from "./setup.js";
