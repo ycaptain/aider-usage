@@ -1,6 +1,6 @@
 {
   "name": "aider-usage",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Offline token/cost usage reports from Aider analytics logs",
   "type": "module",
   "author": "ycaptain <cz.ycaptain@gmail.com>",
