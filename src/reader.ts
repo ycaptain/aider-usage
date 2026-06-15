@@ -5,6 +5,7 @@ import {
   type NormalizedMessage,
   MESSAGE_SEND_EVENT,
   isCommandEvent,
+  isSessionStartEvent,
 } from "./types.js";
 
 /**
@@ -110,7 +111,7 @@ export async function readEvents(path: string): Promise<ReadResult> {
     // 保留用量、session 信号与命令事件; 丢弃其余 (launched/repo/...) 以省内存。
     if (
       ev.event === MESSAGE_SEND_EVENT ||
-      ev.event.endsWith("session") ||
+      isSessionStartEvent(ev.event) ||
       isCommandEvent(ev.event)
     ) {
       events.push(ev);

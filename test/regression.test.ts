@@ -53,4 +53,15 @@ describe("regression: gui session 触发新 session", () => {
     // total_cost 持续上升不归零, 间隔 < 30 分; 唯一切分信号是 gui session
     expect(sessionize(events)).toHaveLength(2);
   });
+
+  it("以 session 结尾的非法事件名 (end_session/obsession) 不误判为起点", () => {
+    // total_cost 上升不归零, 间隔 < 30 分; 这些事件不应触发切分
+    const events = [
+      msg(100, 0.05),
+      cmd("end_session", 150),
+      cmd("obsession", 160),
+      msg(200, 0.9),
+    ];
+    expect(sessionize(events)).toHaveLength(1);
+  });
 });

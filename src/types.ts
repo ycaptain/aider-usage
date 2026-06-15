@@ -41,8 +41,16 @@ export interface Session {
   completionTokens: number;
 }
 
-export const SESSION_START_EVENT = "cli session";
 export const MESSAGE_SEND_EVENT = "message_send";
+
+/**
+ * session 起点判定 (进程级)。reader 收集与 sessionize 切分共用此单一口径, 避免两处漂移。
+ * 显式枚举而非 endsWith("session"): 后者会误判 end_session/obsession 等; 真实日志
+ * (源码核实) 只有 "cli session" / "gui session" 两种, 各带空格。
+ */
+export function isSessionStartEvent(name: string): boolean {
+  return name === "cli session" || name === "gui session";
+}
 
 /**
  * command_* 事件判定。用前缀匹配而非硬编码白名单: 真实日志含 doc 未列的命令
