@@ -23,8 +23,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - **The bare `aider-usage` command now runs `summary` instead of `daily`.**
-  Run `aider-usage daily` for the previous default. (No existing-user
-  compatibility was retained — this is pre-1.0.)
+  Run `aider-usage daily` for the previous day-by-day default.
 - Stream discipline and exit codes: report data is the only thing on stdout;
   all `note:`/`error:` messages go to stderr. A missing log now exits `1`
   (was `0`); an empty date range exits `0` and emits `[]` under `--json`.
