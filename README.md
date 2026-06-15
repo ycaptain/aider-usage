@@ -1,5 +1,8 @@
 # aider-usage
 
+[![CI](https://github.com/ycaptain/aider-usage/actions/workflows/ci.yml/badge.svg)](https://github.com/ycaptain/aider-usage/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/aider-usage)](https://www.npmjs.com/package/aider-usage)
+
 Offline token/cost usage reports from [Aider](https://aider.chat) analytics logs.
 Like [ccusage](https://github.com/ryoppippi/ccusage), but for Aider. Your aider
 workflow stays exactly the same; you configure logging once and read reports anytime.
@@ -13,10 +16,16 @@ Aider. This fills that gap with zero token cost (it only reads a local file).
 
 ## Install
 
+Run it directly without installing:
+
 ```sh
-pnpm install
-pnpm build
-npm link   # exposes the `aider-usage` binary
+npx aider-usage daily
+```
+
+Or install globally to get the `aider-usage` binary:
+
+```sh
+npm install -g aider-usage
 ```
 
 ## Setup (one time)

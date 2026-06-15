@@ -3,3 +3,7 @@ dist/
 *.log
 .DS_Store
 coverage/
+.backlog/
+
+# Local AI/agent instructions — not part of the public project
+CLAUDE.md
