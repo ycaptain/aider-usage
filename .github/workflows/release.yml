@@ -4,13 +4,14 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # required for npm provenance
+      id-token: write # required for npm provenance + OIDC trusted publishing
     steps:
       - uses: actions/checkout@v6
 
@@ -22,10 +23,12 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
+      # OIDC trusted publishing requires npm >= 11.5.1 (Node 22 ships npm 10.x)
+      - run: npm install -g npm@latest
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm build
 
+      # No NODE_AUTH_TOKEN: auth is via GitHub OIDC (trusted publisher on npmjs.com)
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
