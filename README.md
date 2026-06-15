@@ -28,6 +28,8 @@ Or install globally to get the `aider-usage` binary:
 npm install -g aider-usage
 ```
 
+Requires Node.js >= 22.12.
+
 ## Setup (one time)
 
 ```sh

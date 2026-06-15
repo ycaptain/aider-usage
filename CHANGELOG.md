@@ -6,6 +6,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Raised minimum Node.js to >= 22.12 (was >= 18). Node 18 and 20 are both
+  end-of-life; this aligns with the toolchain below and drops EOL runtimes.
+- Bumped CI/release actions to v6 (checkout, setup-node, pnpm/action-setup)
+  ahead of GitHub's Node20-actions cutover.
+- Upgraded dev/runtime dependencies: commander 12→15, typescript 5→6,
+  vitest 2→4, @types/node 22→25, fast-check 3→4. No user-facing behavior
+  change (all 47 tests pass unchanged).
+
 ## [0.1.0] - 2026-06-15
 
 Initial public release.
