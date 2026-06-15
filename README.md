@@ -54,6 +54,21 @@ aider-usage daily --json  # machine-readable output
 `AIDER_USAGE_LOG=/path/to/log.jsonl aider-usage daily` overrides log discovery
 (useful for testing or non-standard setups).
 
+## Example output
+
+```text
+$ aider-usage daily
+┌────────────┬─────────┬────────┬────────────┬──────┐
+│ Date       │    Cost │ Prompt │ Completion │ Msgs │
+├────────────┼─────────┼────────┼────────────┼──────┤
+│ 2025-08-13 │ $0.0300 │  3,000 │        130 │    2 │
+│ 2025-08-14 │ $0.0000 │    500 │         30 │    1 │
+│ 2025-08-15 │ $0.0500 │  3,000 │        200 │    1 │
+│ TOTAL      │ $0.0800 │  6,500 │        360 │    4 │
+└────────────┴─────────┴────────┴────────────┴──────┘
+note: 1 record(s) had no cost data (counted as $0).
+```
+
 ## Design notes
 
 - **Dates** are interpreted in your local timezone; `--since`/`--until` are an
