@@ -42,18 +42,47 @@ This writes `analytics-log: ~/.aider/analytics.jsonl` to `~/.aider.conf.yml`
 ## Usage
 
 ```sh
-aider-usage daily         # cost + tokens grouped by day (default)
+aider-usage               # overview: window, totals, top days/models (default)
+aider-usage summary       # same as the bare command
+aider-usage daily         # cost + tokens grouped by day (ascending)
 aider-usage weekly
 aider-usage monthly
-aider-usage models        # grouped by model
+aider-usage models        # grouped by model (ascending)
 aider-usage session       # per inferred session, most expensive first
 aider-usage commands      # slash-command frequency (unique to aider-usage)
 
 aider-usage daily --since 2026-01-01 --until 2026-06-01
-aider-usage daily --json  # machine-readable output
 ```
 
-`AIDER_USAGE_LOG=/path/to/log.jsonl aider-usage daily` overrides log discovery
+> **Note:** the bare `aider-usage` now runs `summary` (it used to run `daily`).
+> Use `aider-usage daily` for the day-by-day table.
+
+### Output format and color
+
+```sh
+aider-usage models --format json   # machine-readable (alias: --json)
+aider-usage monthly --format md > report.md   # GitHub-flavored markdown table
+aider-usage models --format csv    # RFC-4180 CSV (data rows only, no TOTAL)
+
+aider-usage daily --color always   # force color even when piped
+aider-usage daily --no-color       # disable color (also honors NO_COLOR / TERM=dumb)
+```
+
+Color and cost-tier markers (`▲` high / `=` mid / `·` low) appear only on an
+interactive terminal. Piped and machine formats (`json`/`md`/`csv`) are always
+plain bytes with no ANSI and no notes on stdout, so they are safe to parse.
+
+### Sorting and truncation
+
+```sh
+aider-usage models --sort cost --top 5   # five most expensive models
+aider-usage daily --sort msgs --reverse  # fewest messages first
+```
+
+`--sort` accepts `key|cost|prompt|completion|msgs`. `--top N` truncates the
+displayed rows but the `TOTAL` row still covers everything.
+
+`AIDER_USAGE_LOG=/path/to/log.jsonl aider-usage` overrides log discovery
 (useful for testing or non-standard setups).
 
 ## Example output
@@ -68,8 +97,10 @@ $ aider-usage daily
 │ 2025-08-15 │ $0.0500 │  3,000 │        200 │    1 │
 │ TOTAL      │ $0.0800 │  6,500 │        360 │    4 │
 └────────────┴─────────┴────────┴────────────┴──────┘
-note: 1 record(s) had no cost data (counted as $0).
 ```
+
+Notes such as `note: 1 record(s) had no cost data, counted as $0.` are written to
+**stderr**, never stdout, so they never contaminate piped or redirected reports.
 
 ## Design notes
 
@@ -78,7 +109,14 @@ note: 1 record(s) had no cost data (counted as $0).
 - **Malformed lines** are skipped with a count on stderr (the report never aborts
   on one bad line).
 - **Missing cost** (`cost` null/absent) is counted as `$0`, the record is still
-  counted, and a footnote reports how many. A real `cost: 0` is not flagged.
+  counted, and a `note:` on stderr reports how many. A real `cost: 0` is not flagged.
+- **Streams and exit codes**: report data goes to stdout; all `note:`/`error:`
+  messages go to stderr. A missing log exits `1`; an empty date range exits `0`
+  (and emits `[]` under `--json`).
+- **Cost tiers** are relative to the largest row in the current view
+  (`high ≥ 0.66·max`, `mid ≥ 0.33·max`); an all-zero view shows no high tier.
+  Color is purely redundant — markers and the `TOTAL` label carry the same
+  information after stripping ANSI (colorblind-safe luminance axis, no red/green).
 - **Sessions** are inferred (Aider has no session id) from three signals in order:
   `cli session` event, `total_cost` resetting to about the current cost (new
   process), and a gap greater than 30 minutes between messages.
