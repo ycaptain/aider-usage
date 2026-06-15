@@ -1,0 +1,35 @@
+name: Bug report
+description: Something in aider-usage behaves incorrectly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. aider-usage only reads a local Aider analytics
+        log — please double-check any pasted log snippet is redacted (it should
+        contain no API keys or tokens, but verify).
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: aider-usage daily --since 2026-01-01
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected vs. what happened
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal redacted log snippet that reproduces it (optional)
+      render: json
+  - type: input
+    id: versions
+    attributes:
+      label: aider-usage and Node versions
+      placeholder: "aider-usage 0.1.0, node v20.11.0"
+    validations:
+      required: true
