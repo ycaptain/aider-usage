@@ -12,7 +12,7 @@ pnpm dev -- daily      # run the CLI from source via tsx
 
 ## Before opening a PR
 
-All three must pass — CI enforces them on Node 18/20/22:
+All three must pass — CI enforces them on Node 22/24 (the project requires Node >=22.12):
 
 ```sh
 pnpm typecheck
