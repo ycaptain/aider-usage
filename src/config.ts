@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, isAbsolute } from "node:path";
+import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 
 export const AIDER_CONF_PATH = join(homedir(), ".aider.conf.yml");
@@ -10,7 +10,8 @@ export const DEFAULT_LOG_PATH = join(homedir(), ".aider", "analytics.jsonl");
 export function expandHome(p: string): string {
   if (p === "~") return homedir();
   if (p.startsWith("~/")) return join(homedir(), p.slice(2));
-  return isAbsolute(p) ? p : p;
+  // ~user 形式不展开 (原样传下去会走引导); 其余 (绝对或相对) 原样返回。
+  return p;
 }
 
 export type LogLocation =

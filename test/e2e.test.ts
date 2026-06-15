@@ -3,7 +3,12 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { readEvents, toNormalizedMessage } from "../src/reader.js";
 import { sessionize } from "../src/sessionize.js";
-import { byPeriod, byModel, commandRows } from "../src/aggregate.js";
+import {
+  byPeriod,
+  byModel,
+  commandRows,
+  countCommands,
+} from "../src/aggregate.js";
 import { MESSAGE_SEND_EVENT } from "../src/types.js";
 
 const FIXTURE = join(
@@ -14,7 +19,7 @@ const FIXTURE = join(
 
 describe("e2e: 真实样本片段全流程 (回归锁定)", () => {
   it("跳过坏行, 聚合数字正确, cost=null 计 0 且标记", async () => {
-    const { events, commandCounts, skipped } = await readEvents(FIXTURE);
+    const { events, skipped } = await readEvents(FIXTURE);
     expect(skipped).toBe(1); // 一行损坏
 
     events.sort((a, b) => a.time - b.time);
@@ -40,7 +45,7 @@ describe("e2e: 真实样本片段全流程 (回归锁定)", () => {
     expect(sessions.reduce((s, x) => s + x.cost, 0)).toBeCloseTo(0.08, 6);
     expect(sessions.length).toBeGreaterThanOrEqual(2);
 
-    const cmds = commandRows(commandCounts);
+    const cmds = commandRows(countCommands(events));
     expect(cmds.find((c) => c.command === "command_run")!.count).toBe(2);
   });
 });

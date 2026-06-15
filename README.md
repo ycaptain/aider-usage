@@ -59,6 +59,8 @@ aider-usage daily --json  # machine-readable output
 
 ## Known limitations
 
+- `session` combined with `--since`/`--until` infers sessions within the window,
+  so a process crossing a date boundary may be split (a note is printed).
 - History before you enabled `analytics-log` is unrecoverable.
 - `user_id` is per machine, not per session; concurrent aider processes writing
   the same log cannot be told apart.

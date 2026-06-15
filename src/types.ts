@@ -41,27 +41,13 @@ export interface Session {
   completionTokens: number;
 }
 
-/** 14 种 command_* 事件 (核实自源码; 无 properties, 仅计频)。 */
-export const COMMAND_EVENT_NAMES = [
-  "command_ask",
-  "command_code",
-  "command_run",
-  "command_add",
-  "command_drop",
-  "command_edit",
-  "command_undo",
-  "command_exit",
-  "command_model",
-  "command_clear",
-  "command_web",
-  "command_paste",
-  "command_chat-mode",
-  "command_reasoning-effort",
-] as const;
-
 export const SESSION_START_EVENT = "cli session";
 export const MESSAGE_SEND_EVENT = "message_send";
 
+/**
+ * command_* 事件判定。用前缀匹配而非硬编码白名单: 真实日志含 doc 未列的命令
+ * (如 command_tokens), 白名单会漏掉它们。
+ */
 export function isCommandEvent(name: string): boolean {
   return name.startsWith("command_");
 }

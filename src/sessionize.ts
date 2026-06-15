@@ -2,7 +2,6 @@ import {
   type RawEvent,
   type Session,
   type NormalizedMessage,
-  SESSION_START_EVENT,
   MESSAGE_SEND_EVENT,
 } from "./types.js";
 import { toNormalizedMessage } from "./reader.js";
@@ -45,7 +44,8 @@ export function sessionize(events: RawEvent[]): Session[] {
   };
 
   for (const ev of events) {
-    if (ev.event === SESSION_START_EVENT) {
+    // "cli session" / "gui session" 都是进程级起点 (与 reader 收集口径一致)。
+    if (ev.event.endsWith("session")) {
       forceNew = true;
       continue;
     }

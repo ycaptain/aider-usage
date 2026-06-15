@@ -1,4 +1,9 @@
-import type { NormalizedMessage, Session } from "./types.js";
+import {
+  type NormalizedMessage,
+  type Session,
+  type RawEvent,
+  isCommandEvent,
+} from "./types.js";
 
 export type Period = "day" | "week" | "month";
 
@@ -80,7 +85,18 @@ export function byEditFormat(messages: NormalizedMessage[]): UsageRow[] {
   return groupBy(messages, (m) => m.editFormat);
 }
 
-/** 命令频率: 由 reader 的 commandCounts 转成排序行 (按频次降序)。 */
+/** 从 (已按时间过滤的) 事件流统计 command_* 频率。前缀匹配, 捕获 doc 未列的命令。 */
+export function countCommands(events: RawEvent[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const ev of events) {
+    if (isCommandEvent(ev.event)) {
+      counts[ev.event] = (counts[ev.event] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
+/** 命令频率: 把计数转成排序行 (按频次降序)。 */
 export function commandRows(
   counts: Record<string, number>,
 ): Array<{ command: string; count: number }> {
@@ -89,11 +105,18 @@ export function commandRows(
     .sort((a, b) => b.count - a.count || a.command.localeCompare(b.command));
 }
 
+/** 本地时区 "YYYY-MM-DD HH:mm" (session key 用, 与其它聚合的本地时区一致)。 */
+function localDateTime(time: number): string {
+  const d = new Date(time * 1000);
+  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${date} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 /** session 汇总行 (按成本降序, 用于 "最贵的 session")。 */
 export function sessionRows(sessions: Session[]): UsageRow[] {
   return sessions
     .map((s) => ({
-      key: new Date(s.startTime * 1000).toISOString(),
+      key: localDateTime(s.startTime),
       cost: s.cost,
       promptTokens: s.promptTokens,
       completionTokens: s.completionTokens,

@@ -75,12 +75,13 @@ export function toNormalizedMessage(ev: RawEvent): NormalizedMessage {
   };
 }
 
-/** reader 产出: 排序就绪的相关事件 + 命令频率 + 跳过计数。 */
+/** reader 产出: 排序就绪的相关事件 + 跳过计数。 */
 export interface ReadResult {
-  /** message_send 与 "cli session" 等 session 信号事件, 未排序 (调用方排序)。 */
+  /**
+   * message_send、session 信号、command_* 事件 (全部带 time, 未排序)。
+   * command 事件保留进流以便下游按时间过滤后再计数 (不能在读取阶段就丢弃 time)。
+   */
   events: RawEvent[];
-  /** command_* 频率 (流式累加, 不驻留)。 */
-  commandCounts: Record<string, number>;
   /** 解析失败被跳过的行数。 */
   skipped: number;
 }
@@ -92,7 +93,6 @@ export interface ReadResult {
  */
 export async function readEvents(path: string): Promise<ReadResult> {
   const events: RawEvent[] = [];
-  const commandCounts: Record<string, number> = {};
   let skipped = 0;
 
   const rl = createInterface({
@@ -107,14 +107,15 @@ export async function readEvents(path: string): Promise<ReadResult> {
       skipped++;
       continue;
     }
-    if (isCommandEvent(ev.event)) {
-      commandCounts[ev.event] = (commandCounts[ev.event] ?? 0) + 1;
-      continue;
-    }
-    if (ev.event === MESSAGE_SEND_EVENT || ev.event.endsWith("session")) {
+    // 保留用量、session 信号与命令事件; 丢弃其余 (launched/repo/...) 以省内存。
+    if (
+      ev.event === MESSAGE_SEND_EVENT ||
+      ev.event.endsWith("session") ||
+      isCommandEvent(ev.event)
+    ) {
       events.push(ev);
     }
   }
 
-  return { events, commandCounts, skipped };
+  return { events, skipped };
 }

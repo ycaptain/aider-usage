@@ -9,6 +9,7 @@ import {
   byPeriod,
   byModel,
   commandRows,
+  countCommands,
   sessionRows,
   type Period,
 } from "./aggregate.js";
@@ -77,8 +78,8 @@ function resolveRange(opts: GlobalOpts): {
 
 interface Loaded {
   messages: NormalizedMessage[];
+  /** 已按时间过滤的事件流 (含 message_send/session/command_*)。 */
   events: RawEvent[];
-  commandCounts: Record<string, number>;
   skipped: number;
 }
 
@@ -90,7 +91,7 @@ async function load(opts: GlobalOpts): Promise<Loaded | null> {
     return null;
   }
   const { since, until } = resolveRange(opts);
-  const { events, commandCounts, skipped } = await readEvents(loc.path);
+  const { events, skipped } = await readEvents(loc.path);
   // 样本可能乱序: 聚合/推断前必须按 time 排序
   events.sort((a, b) => a.time - b.time);
   const filtered = filterByRange(events, since, until);
@@ -100,7 +101,7 @@ async function load(opts: GlobalOpts): Promise<Loaded | null> {
   if (skipped > 0) {
     console.error(`note: skipped ${skipped} malformed line(s).`);
   }
-  return { messages, events: filtered, commandCounts, skipped };
+  return { messages, events: filtered, skipped };
 }
 
 const program = new Command();
@@ -153,6 +154,12 @@ program
     const opts = program.opts<GlobalOpts>();
     const data = await load(opts);
     if (!data) process.exit(0);
+    if (opts.since !== undefined || opts.until !== undefined) {
+      // session 在已过滤的子集上推断: 跨时间窗边界的进程会被截断/拆分。
+      console.error(
+        "note: sessions are inferred within the date range; processes crossing the boundary may be split.",
+      );
+    }
     const sessions = sessionize(data.events);
     const rows = sessionRows(sessions);
     console.log(
@@ -167,7 +174,7 @@ program
     const opts = program.opts<GlobalOpts>();
     const data = await load(opts);
     if (!data) process.exit(0);
-    const rows = commandRows(data.commandCounts);
+    const rows = commandRows(countCommands(data.events));
     console.log(opts.json ? renderJson(rows) : renderCommandTable(rows));
   });
 
